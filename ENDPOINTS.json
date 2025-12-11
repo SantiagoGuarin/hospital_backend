@@ -1,0 +1,660 @@
+{
+  "project": "Hospital Backend API",
+  "version": "1.0.0",
+  "base_url": "http://localhost:8000",
+  "api_prefix": "/api",
+  "endpoints": [
+    {
+      "path": "/api/regiones/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for regiones",
+      "response_fields": {
+        "region_id": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "nombre": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 100
+        }
+      },
+      "examples": {
+        "list": "GET /api/regiones/",
+        "create": "POST /api/regiones/",
+        "retrieve": "GET /api/regiones/{id}/",
+        "update": "PUT /api/regiones/{id}/",
+        "partial_update": "PATCH /api/regiones/{id}/",
+        "delete": "DELETE /api/regiones/{id}/"
+      }
+    },
+    {
+      "path": "/api/sedes/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for sedes",
+      "response_fields": {
+        "id_sede": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "nom_sede": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 100
+        },
+        "ciudad": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 80
+        },
+        "region": {
+          "type": "RegionSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "region_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        }
+      },
+      "examples": {
+        "list": "GET /api/sedes/",
+        "create": "POST /api/sedes/",
+        "retrieve": "GET /api/sedes/{id}/",
+        "update": "PUT /api/sedes/{id}/",
+        "partial_update": "PATCH /api/sedes/{id}/",
+        "delete": "DELETE /api/sedes/{id}/"
+      }
+    },
+    {
+      "path": "/api/departamentos/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for departamentos",
+      "response_fields": {
+        "id_dept": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "nom_dept": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 100
+        }
+      },
+      "examples": {
+        "list": "GET /api/departamentos/",
+        "create": "POST /api/departamentos/",
+        "retrieve": "GET /api/departamentos/{id}/",
+        "update": "PUT /api/departamentos/{id}/",
+        "partial_update": "PATCH /api/departamentos/{id}/",
+        "delete": "DELETE /api/departamentos/{id}/"
+      }
+    },
+    {
+      "path": "/api/cargos/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for cargos",
+      "response_fields": {
+        "cargo_id": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "nombre": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 100
+        }
+      },
+      "examples": {
+        "list": "GET /api/cargos/",
+        "create": "POST /api/cargos/",
+        "retrieve": "GET /api/cargos/{id}/",
+        "update": "PUT /api/cargos/{id}/",
+        "partial_update": "PATCH /api/cargos/{id}/",
+        "delete": "DELETE /api/cargos/{id}/"
+      }
+    },
+    {
+      "path": "/api/roles/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for roles",
+      "response_fields": {
+        "rol_id": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "nombre": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 80
+        }
+      },
+      "examples": {
+        "list": "GET /api/roles/",
+        "create": "POST /api/roles/",
+        "retrieve": "GET /api/roles/{id}/",
+        "update": "PUT /api/roles/{id}/",
+        "partial_update": "PATCH /api/roles/{id}/",
+        "delete": "DELETE /api/roles/{id}/"
+      }
+    },
+    {
+      "path": "/api/tipos-documento/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for tipos-documento",
+      "response_fields": {
+        "tipo_doc_id": {
+          "type": "IntegerField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "nombre": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 50
+        }
+      },
+      "examples": {
+        "list": "GET /api/tipos-documento/",
+        "create": "POST /api/tipos-documento/",
+        "retrieve": "GET /api/tipos-documento/{id}/",
+        "update": "PUT /api/tipos-documento/{id}/",
+        "partial_update": "PATCH /api/tipos-documento/{id}/",
+        "delete": "DELETE /api/tipos-documento/{id}/"
+      }
+    },
+    {
+      "path": "/api/tipos-servicio/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for tipos-servicio",
+      "response_fields": {
+        "cod_servicio": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "nombre": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 80
+        }
+      },
+      "examples": {
+        "list": "GET /api/tipos-servicio/",
+        "create": "POST /api/tipos-servicio/",
+        "retrieve": "GET /api/tipos-servicio/{id}/",
+        "update": "PUT /api/tipos-servicio/{id}/",
+        "partial_update": "PATCH /api/tipos-servicio/{id}/",
+        "delete": "DELETE /api/tipos-servicio/{id}/"
+      }
+    },
+    {
+      "path": "/api/tipos-equipamiento/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for tipos-equipamiento",
+      "response_fields": {
+        "tipo_equipo_id": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "nombre": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 80
+        }
+      },
+      "examples": {
+        "list": "GET /api/tipos-equipamiento/",
+        "create": "POST /api/tipos-equipamiento/",
+        "retrieve": "GET /api/tipos-equipamiento/{id}/",
+        "update": "PUT /api/tipos-equipamiento/{id}/",
+        "partial_update": "PATCH /api/tipos-equipamiento/{id}/",
+        "delete": "DELETE /api/tipos-equipamiento/{id}/"
+      }
+    },
+    {
+      "path": "/api/proveedores/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for proveedores",
+      "response_fields": {
+        "proveedor_id": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "nombre": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 100
+        },
+        "region": {
+          "type": "RegionSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "region_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        }
+      },
+      "examples": {
+        "list": "GET /api/proveedores/",
+        "create": "POST /api/proveedores/",
+        "retrieve": "GET /api/proveedores/{id}/",
+        "update": "PUT /api/proveedores/{id}/",
+        "partial_update": "PATCH /api/proveedores/{id}/",
+        "delete": "DELETE /api/proveedores/{id}/"
+      }
+    },
+    {
+      "path": "/api/personas/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for personas",
+      "response_fields": {
+        "documento": {
+          "type": "IntegerField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "nom_persona": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 150
+        },
+        "fecha_nac": {
+          "type": "DateField",
+          "required": false,
+          "read_only": false,
+          "allow_null": true
+        },
+        "genero": {
+          "type": "CharField",
+          "required": false,
+          "read_only": false,
+          "allow_null": true,
+          "max_length": 1
+        },
+        "dir_per": {
+          "type": "CharField",
+          "required": false,
+          "read_only": false,
+          "allow_null": true,
+          "max_length": 150
+        },
+        "correo_per": {
+          "type": "CharField",
+          "required": false,
+          "read_only": false,
+          "allow_null": true,
+          "max_length": 120
+        },
+        "tipo_doc": {
+          "type": "TipoDocumentoSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "tipo_doc_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "id_sede": {
+          "type": "SedeHospitalariaSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "id_sede_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        }
+      },
+      "examples": {
+        "list": "GET /api/personas/",
+        "create": "POST /api/personas/",
+        "retrieve": "GET /api/personas/{id}/",
+        "update": "PUT /api/personas/{id}/",
+        "partial_update": "PATCH /api/personas/{id}/",
+        "delete": "DELETE /api/personas/{id}/"
+      }
+    },
+    {
+      "path": "/api/empleados/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for empleados",
+      "response_fields": {
+        "id_emp": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "documento": {
+          "type": "PersonaSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "documento_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "id_dept": {
+          "type": "DepartamentoTrabajoSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "id_dept_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "cargo": {
+          "type": "CargoSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "cargo_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "rol": {
+          "type": "RolSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "rol_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "hash_contra": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        }
+      },
+      "examples": {
+        "list": "GET /api/empleados/",
+        "create": "POST /api/empleados/",
+        "retrieve": "GET /api/empleados/{id}/",
+        "update": "PUT /api/empleados/{id}/",
+        "partial_update": "PATCH /api/empleados/{id}/",
+        "delete": "DELETE /api/empleados/{id}/"
+      }
+    },
+    {
+      "path": "/api/pacientes/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for pacientes",
+      "response_fields": {
+        "cod_pac": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "documento": {
+          "type": "PersonaSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "documento_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        }
+      },
+      "examples": {
+        "list": "GET /api/pacientes/",
+        "create": "POST /api/pacientes/",
+        "retrieve": "GET /api/pacientes/{id}/",
+        "update": "PUT /api/pacientes/{id}/",
+        "partial_update": "PATCH /api/pacientes/{id}/",
+        "delete": "DELETE /api/pacientes/{id}/"
+      }
+    },
+    {
+      "path": "/api/citas/",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "CRUD operations for citas",
+      "response_fields": {
+        "id_cita": {
+          "type": "IntegerField",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "cod_pac": {
+          "type": "PacienteSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "cod_pac_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "id_emp": {
+          "type": "EmpleadoSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "id_emp_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "cod_servicio": {
+          "type": "TipoServicioSerializer",
+          "required": false,
+          "read_only": true,
+          "allow_null": false
+        },
+        "cod_servicio_id": {
+          "type": "PrimaryKeyRelatedField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "fecha_hora": {
+          "type": "DateTimeField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false
+        },
+        "estado": {
+          "type": "CharField",
+          "required": true,
+          "read_only": false,
+          "allow_null": false,
+          "max_length": 20
+        }
+      },
+      "examples": {
+        "list": "GET /api/citas/",
+        "create": "POST /api/citas/",
+        "retrieve": "GET /api/citas/{id}/",
+        "update": "PUT /api/citas/{id}/",
+        "partial_update": "PATCH /api/citas/{id}/",
+        "delete": "DELETE /api/citas/{id}/"
+      }
+    },
+    {
+      "path": "/api/login/",
+      "methods": [
+        "POST"
+      ],
+      "description": "Authentication endpoint - returns JWT token",
+      "request_fields": {
+        "documento": {
+          "type": "integer",
+          "required": true,
+          "description": "Employee document number"
+        },
+        "password": {
+          "type": "string",
+          "required": true,
+          "description": "Employee password"
+        }
+      },
+      "response_fields": {
+        "token": {
+          "type": "string",
+          "description": "JWT authentication token"
+        },
+        "empleado": {
+          "type": "object",
+          "description": "Employee data"
+        }
+      },
+      "example_request": {
+        "documento": 12345678,
+        "password": "password123"
+      }
+    }
+  ],
+  "total_endpoints": 14
+}
