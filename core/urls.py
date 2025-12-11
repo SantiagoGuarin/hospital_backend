@@ -6,7 +6,7 @@ from .views import *
 router = DefaultRouter()
 router.register("regiones", RegionViewSet, basename="regiones")
 router.register("sedes", SedeHospitalariaViewSet, basename="sedes")
-router.register("historias", HistoriaClinicaViewSet, basename="historias")
+router.register("historias-base", HistoriaClinicaViewSet, basename="historias-base")
 router.register("departamentos", DepartamentoTrabajoViewSet, basename="departamentos")
 router.register("cargos", CargoViewSet, basename="cargos")
 router.register("roles", RolViewSet, basename="roles")
@@ -32,6 +32,8 @@ urlpatterns = [
     path("equipamiento/", EquipamientoReporteView.as_view()),
     path("empleados/", EmpleadosReporteView.as_view()),
     path("empleados/<int:id_emp>/", EmpleadoDetalleView.as_view()),
-    path("pacientes/", PacientesReporteView.as_view()),
+    path("pacientes/", PacientesView.as_view()),
+    path("pacientes/<int:cod_pac>/", PacienteDetalleView.as_view()),
+    path("historias/<int:cod_hist>/", HistoriaClinicaDetalleView.as_view()),
 
 ]

@@ -483,10 +483,10 @@ class PacienteViewSet(viewsets.ModelViewSet):
     queryset = Pacientes.objects.all()
     serializer_class = PacienteSerializer
     permission_classes = [AllowAny]
+    
+class PacientesView(APIView):
 
-class PacientesReporteView(APIView):
     def get(self, request):
-
         sql = """
             SELECT 
                 p.cod_pac,
@@ -501,22 +501,208 @@ class PacientesReporteView(APIView):
             cursor.execute(sql)
             rows = cursor.fetchall()
 
-        data = []
-        for row in rows:
-            cod_pac = row[0]
-            documento = row[1]
-            nombre = row[2]
+        data = [
+            {
+                "cod_pac": row[0],
+                "documento": row[1],
+                "persona": {
+                    "documento": row[1],
+                    "nombre": row[2]
+                }
+            }
+            for row in rows
+        ]
 
-            data.append({
+        return Response(data)
+
+    def post(self, request):
+
+        persona = request.data.get("persona")
+
+        if not persona:
+            return Response({"error": "Debe enviar el objeto 'persona'"}, status=400)
+
+        documento = persona.get("documento")
+        nombre = persona.get("nombre")
+        fecha_nac = persona.get("fecha_nac")
+        genero = persona.get("genero")
+        direccion = persona.get("direccion")
+        correo = persona.get("correo")
+        tipo_doc_id = persona.get("tipo_doc_id")
+        id_sede = persona.get("id_sede")
+
+        if not documento or not nombre:
+            return Response({"error": "documento y nombre son obligatorios"}, status=400)
+
+        sql_persona = """
+            INSERT INTO personas (documento, nom_persona, fecha_nac, genero, dir_per, correo_per, tipo_doc_id, id_sede)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING documento;
+        """
+
+        sql_paciente = """
+            INSERT INTO pacientes (documento)
+            VALUES (%s)
+            RETURNING cod_pac;
+        """
+
+        try:
+            with connection.cursor() as cursor:
+
+                cursor.execute(sql_persona, [
+                    documento, nombre, fecha_nac, genero,
+                    direccion, correo, tipo_doc_id, id_sede
+                ])
+                cursor.fetchone()
+
+                cursor.execute(sql_paciente, [documento])
+                cod_pac = cursor.fetchone()[0]
+
+            data = {
                 "cod_pac": cod_pac,
                 "documento": documento,
                 "persona": {
                     "documento": documento,
                     "nombre": nombre
                 }
-            })
+            }
+
+            return Response(data, status=201)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
+class PacienteDetalleView(APIView):
+
+    def get(self, request, cod_pac):
+
+        sql = """
+            SELECT 
+                p.cod_pac,
+                per.documento,
+                per.nom_persona
+            FROM pacientes p
+            JOIN personas per ON p.documento = per.documento
+            WHERE p.cod_pac = %s;
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql, [cod_pac])
+            row = cursor.fetchone()
+
+        if not row:
+            return Response({"error": "Paciente no encontrado"}, status=404)
+
+        cod_pac, documento, nombre = row
+
+        data = {
+            "cod_pac": cod_pac,
+            "documento": documento,
+            "persona": {
+                "documento": documento,
+                "nombre": nombre
+            }
+        }
 
         return Response(data)
+
+    def put(self, request, cod_pac):
+
+        persona_data = request.data.get("persona")
+
+        if not persona_data:
+            return Response({"error": "Debe enviar el objeto 'persona'"}, status=400)
+
+        sql_get_doc = "SELECT documento FROM pacientes WHERE cod_pac = %s;"
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_get_doc, [cod_pac])
+            row = cursor.fetchone()
+
+        if not row:
+            return Response({"error": "Paciente no encontrado"}, status=404)
+
+        documento = row[0]
+
+        nombre = persona_data.get("nombre")
+        fecha_nac = persona_data.get("fecha_nac")
+        genero = persona_data.get("genero")
+        direccion = persona_data.get("direccion")
+        correo = persona_data.get("correo")
+        tipo_doc_id = persona_data.get("tipo_doc_id")
+        id_sede = persona_data.get("id_sede")
+
+        campos = []
+        valores = []
+
+        if nombre is not None:
+            campos.append("nom_persona = %s")
+            valores.append(nombre)
+
+        if fecha_nac is not None:
+            campos.append("fecha_nac = %s")
+            valores.append(fecha_nac)
+
+        if genero is not None:
+            campos.append("genero = %s")
+            valores.append(genero)
+
+        if direccion is not None:
+            campos.append("dir_per = %s")
+            valores.append(direccion)
+
+        if correo is not None:
+            campos.append("correo_per = %s")
+            valores.append(correo)
+
+        if tipo_doc_id is not None:
+            campos.append("tipo_doc_id = %s")
+            valores.append(tipo_doc_id)
+
+        if id_sede is not None:
+            campos.append("id_sede = %s")
+            valores.append(id_sede)
+
+        if not campos:
+            return Response({"error": "No hay campos válidos para actualizar"}, status=400)
+
+        valores.append(documento)
+
+        sql_update = f"""
+            UPDATE personas
+            SET {", ".join(campos)}
+            WHERE documento = %s;
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_update, valores)
+
+        return Response({"mensaje": "Paciente actualizado correctamente"})
+
+    def delete(self, request, cod_pac):
+
+        sql_check = "SELECT documento FROM pacientes WHERE cod_pac = %s;"
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_check, [cod_pac])
+            row = cursor.fetchone()
+
+        if not row:
+            return Response({"error": "Paciente no encontrado"}, status=404)
+
+        documento = row[0]
+
+        sql_delete = "DELETE FROM pacientes WHERE cod_pac = %s;"
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_delete, [cod_pac])
+
+        return Response({
+            "mensaje": "Paciente eliminado correctamente",
+            "cod_pac": cod_pac,
+            "documento": documento
+        })
+
 
 class MedicamentoViewSet(viewsets.ModelViewSet):
     queryset = Medicamentos.objects.all()
@@ -643,13 +829,148 @@ class TelefonosPorSedeView(APIView):
 class HistoriaClinicaViewSet(viewsets.ModelViewSet):
     queryset = HistoriasClinicas.objects.all()
     serializer_class = HistoriaClinicaSerializer
-    permission_classes = [AllowAny]
 
+    def list(self, request):
+
+        sql = """
+            SELECT 
+                h.cod_hist,
+                h.fecha_hora,
+                h.diagnostico,
+
+                -- Paciente
+                per_pac.nom_persona AS paciente_nombre,
+
+                -- Empleado
+                per_emp.nom_persona AS empleado_nombre
+
+            FROM historias_clinicas h
+            JOIN citas c ON h.id_cita = c.id_cita
+
+            -- Paciente
+            JOIN pacientes pac ON c.cod_pac = pac.cod_pac
+            JOIN personas per_pac ON pac.documento = per_pac.documento
+
+            -- Empleado
+            JOIN empleados emp ON c.id_emp = emp.id_emp
+            JOIN personas per_emp ON emp.documento = per_emp.documento
+
+            ORDER BY h.cod_hist;
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+
+        data = []
+
+        for row in rows:
+            cod_hist = row[0]
+            fecha = row[1]
+            diagnostico = row[2]
+            paciente_nombre = row[3]
+            empleado_nombre = row[4]
+
+            data.append({
+                "cod_hist": cod_hist,
+                "fecha_registro_hora": fecha.isoformat(),
+                "diagnostico": diagnostico,
+                "paciente": paciente_nombre,
+                "empleado": empleado_nombre
+            })
+
+        return Response(data)
 
 class PrescripcionMedicamentoViewSet(viewsets.ModelViewSet):
     queryset = PrescripcionesMedicamentos.objects.all()
     serializer_class = PrescripcionMedicamentoSerializer
     permission_classes = [AllowAny]
+
+class HistoriaClinicaDetalleView(APIView):
+
+    def get(self, request, cod_hist):
+
+        sql_hist = """
+            SELECT 
+                h.cod_hist,
+                h.fecha_hora,
+                h.diagnostico,
+                c.cod_pac,
+                p_pac.nom_persona AS paciente_nombre,
+                c.id_emp,
+                p_emp.nom_persona AS empleado_nombre
+            FROM historias_clinicas h
+            JOIN citas c ON h.id_cita = c.id_cita
+            
+            -- Paciente
+            JOIN pacientes pac ON c.cod_pac = pac.cod_pac
+            JOIN personas p_pac ON pac.documento = p_pac.documento
+
+            -- Empleado
+            JOIN empleados e ON c.id_emp = e.id_emp
+            JOIN personas p_emp ON e.documento = p_emp.documento
+
+            WHERE h.cod_hist = %s;
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_hist, [cod_hist])
+            row = cursor.fetchone()
+
+        if not row:
+            return Response({"error": "Historia clínica no encontrada"}, status=404)
+
+        (
+            cod_hist,
+            fecha,
+            diagnostico,
+            cod_pac,
+            paciente_nombre,
+            id_emp,
+            empleado_nombre
+        ) = row
+
+        sql_presc = """
+            SELECT 
+                id_presc,
+                cod_med,
+                dosis,
+                frecuencia,
+                duracion_dias,
+                fecha_emision
+            FROM prescripciones_medicamentos
+            WHERE cod_hist = %s
+            ORDER BY id_presc;
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_presc, [cod_hist])
+            presc_rows = cursor.fetchall()
+
+        prescripciones = [
+            {
+                "id_presc": p[0],
+                "cod_med": p[1],
+                "dosis": p[2],
+                "frecuencia": p[3],
+                "duracion_dias": p[4],
+                "fecha_emision": p[5].isoformat() if p[5] else None
+            }
+            for p in presc_rows
+        ]
+
+        data = {
+            "cod_hist": cod_hist,
+            "fecha_registro_hora": fecha.isoformat(),
+            "diagnostico": diagnostico,
+            "cod_pac": cod_pac,
+            "id_emp": id_emp,
+            "paciente_nombre": paciente_nombre,
+            "empleado_nombre": empleado_nombre,
+            "prescripciones": prescripciones
+        }
+
+        return Response(data, status=200)
 
 
 class RegistroMedicamentoViewSet(viewsets.ModelViewSet):
